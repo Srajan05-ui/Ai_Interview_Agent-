@@ -49,7 +49,17 @@ class InterviewEndRequest(BaseModel):
 
 class InterviewEndResponse(BaseModel):
     status: str
-    scorecardId: Optional[str] = None
+    scorecardId: str
+
+class InterviewAnswerRequest(BaseModel):
+    type: str # 'text_answer', 'code_submission', 'audio_chunk'
+    data: Any
+
+class InterviewStateResponse(BaseModel):
+    question: Optional[Dict[str, Any]]
+    graph: Optional[Dict[str, Any]]
+    audioBase64: Optional[str] = None
+    transcript_final: Optional[str] = None
 
 class FeedbackItem(BaseModel):
     category: str

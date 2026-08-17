@@ -1,7 +1,7 @@
 // app/interview/[sessionId]/page.tsx
 "use client";
 
-import { useInterviewSocket } from "@/hooks/useInterviewSocket";
+import { useInterviewRest } from "@/hooks/useInterviewRest";
 import { useAntiCheat } from "@/hooks/useAntiCheat";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -32,7 +32,7 @@ export default function InterviewRoomPage() {
     conceptGraph,
     isCheatWarning,
     sendEvent
-  } = useInterviewSocket(sessionId);
+  } = useInterviewRest(sessionId);
 
   const { flagCheat } = useAntiCheat(sessionId, () => setLocalCheatWarning(true));
 

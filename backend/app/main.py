@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 from app.api.v1 import auth, resume, interview, history, scorecard, roadmap
-from app.ws import interview as interview_ws
 from app.db.session import engine, Base
 
 app = FastAPI(
@@ -32,7 +31,6 @@ app.include_router(interview.router, prefix="/api/v1/interview", tags=["Intervie
 app.include_router(history.router, prefix="/api/v1/history", tags=["History"])
 app.include_router(scorecard.router, prefix="/api/v1/scorecard", tags=["Scorecard"])
 app.include_router(roadmap.router, prefix="/api/v1/roadmap", tags=["Roadmap"])
-app.include_router(interview_ws.router, prefix="/ws/interview", tags=["WebSocket Interview"])
 
 @app.get("/health")
 async def health_check():

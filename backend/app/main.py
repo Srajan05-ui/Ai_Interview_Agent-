@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 from app.api.v1 import auth, resume, interview, history, scorecard, roadmap
 from app.ws import interview as interview_ws
 from app.db.session import engine, Base
@@ -34,3 +37,18 @@ app.include_router(interview_ws.router, prefix="/ws/interview", tags=["WebSocket
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+# Serve SPA statically if the directory exists
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+
+if os.path.exists(STATIC_DIR):
+    app.mount("/_next", StaticFiles(directory=os.path.join(STATIC_DIR, "_next")), name="next_static")
+    
+    # Catch-all route to serve the index.html or other static files
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        file_path = os.path.join(STATIC_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        # SPA fallback
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))

@@ -32,20 +32,12 @@ COPY --from=frontend-builder /app/frontend/.next/standalone/frontend ./frontend
 COPY --from=frontend-builder /app/frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-builder /app/frontend/public ./frontend/public
 
+# Copy start script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Expose port
 ENV PORT=8000
 EXPOSE $PORT
 
-# Start script: run Next.js on port 3000 and FastAPI on $PORT
-# FastAPI will reverse-proxy or we use a simple supervisor approach
-COPY <<'EOF' /app/start.sh
-#!/bin/bash
-# Start Next.js standalone server in background on port 3000
-cd /app/frontend && PORT=3000 node server.js &
-
-# Start FastAPI (Uvicorn) on the main port
-cd /app && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
-EOF
-
-RUN chmod +x /app/start.sh
 CMD ["/bin/bash", "/app/start.sh"]

@@ -22,3 +22,4 @@ websockets
 elevenlabs
 openai
 aiosqlite
+httpx

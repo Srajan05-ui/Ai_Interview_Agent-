@@ -14,6 +14,10 @@ import TopicProgressMap from "@/components/interview/TopicProgressMap";
 import MediaControls from "@/components/interview/MediaControls";
 import CodeEditorPanel from "@/components/interview/CodeEditorPanel";
 
+export function generateStaticParams() {
+  return [];
+}
+
 export default function InterviewRoomPage() {
   const params = useParams();
   const sessionId = params.sessionId as string;

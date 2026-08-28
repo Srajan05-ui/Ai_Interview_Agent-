@@ -41,7 +41,10 @@ async def generate(prompt: str, response_schema: Optional[Dict[str, Any]] = None
     # 2. Fallback: Groq
     try:
         if os.getenv("GROQ_API_KEY"):
-            llm = ChatGroq(model="llama3-8b-8192")
+            llm = ChatGroq(
+                model="llama-3.1-8b-instant",
+                model_kwargs={"response_format": {"type": "json_object"}}
+            )
             response = await _call_provider_with_timeout(lambda: llm.ainvoke([HumanMessage(content=prompt)]))
             return LLMResult(content=response.content, provider="groq")
     except Exception as e:

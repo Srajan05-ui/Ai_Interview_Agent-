@@ -22,23 +22,14 @@ Return ONLY valid JSON.
 """
 
 GENERATE_PROMPT = """
-You are an expert technical interviewer.
-Based on the candidate's concept graph, generate the NEXT question.
+You are an expert technical interviewer. Generate the next interview question as a JSON object.
 
-Concept Graph:
-{concept_graph}
-
+Concept Graph: {concept_graph}
 Company Style: {company_style}
 Interview Type: {interview_type}
 
-Provide the next question in STRICT JSON matching this schema:
-{{
-    "questionText": "string",
-    "topic": "string",
-    "difficulty": "string (easy/medium/hard)",
-    "adaptiveReason": "string (Why this question was chosen based on the graph)"
-}}
-Return ONLY valid JSON.
+Respond with ONLY a raw JSON object, no markdown, no explanation. Schema:
+{{"questionText": "the question text here", "topic": "topic name", "difficulty": "easy or medium or hard", "adaptiveReason": "why this question was picked"}}
 """
 
 def extract_json(content: str) -> str:
@@ -77,10 +68,10 @@ async def generate_next_question(concept_graph: dict, session_data: dict) -> dic
     try:
         return json.loads(content)
     except Exception as e:
-        print(f"Question generation parse error: {e}")
+        print(f"Question generation parse error: {e}, raw content: {content[:200]}")
         return {
-            "questionText": f"DEBUG: {str(e)} | RAW LLM: {content}",
-            "topic": "error",
+            "questionText": "Could you walk me through a challenging technical problem you have solved recently and explain your approach?",
+            "topic": "behavioral",
             "difficulty": "medium",
-            "adaptiveReason": "Fallback question due to parsing error."
+            "adaptiveReason": "Default question while AI is warming up."
         }

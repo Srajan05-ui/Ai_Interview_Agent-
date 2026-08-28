@@ -54,7 +54,7 @@ async def generate(prompt: str, response_schema: Optional[Dict[str, Any]] = None
             llm = ChatOpenAI(
                 openai_api_key=os.getenv("OPENROUTER_API_KEY"),
                 openai_api_base="https://openrouter.ai/api/v1",
-                model="mistralai/mistral-7b-instruct:free" 
+                model="meta-llama/llama-3-8b-instruct:free" 
             )
             response = await _call_provider_with_timeout(lambda: llm.ainvoke([HumanMessage(content=prompt)]))
             return LLMResult(content=response.content, provider="openrouter")

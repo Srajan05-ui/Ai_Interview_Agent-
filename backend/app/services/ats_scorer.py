@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Optional
 from app.services.llm_router import generate
 
@@ -34,6 +35,12 @@ Extract the following information and return it STRICTLY as a JSON object matchi
 Return ONLY valid JSON. Do not include markdown formatting like ```json or any other text.
 """
 
+def extract_json(content: str) -> str:
+    match = re.search(r'\{.*\}', content, re.DOTALL)
+    if match:
+        return match.group(0)
+    return content
+
 async def analyze_resume(text: str, job_description: Optional[str] = None) -> dict:
     prompt = ATS_PROMPT_TEMPLATE.format(
         job_description=job_description or "None provided. Use general software engineering criteria.",
@@ -45,15 +52,7 @@ async def analyze_resume(text: str, job_description: Optional[str] = None) -> di
     result = await generate(prompt)
     
     # Clean up potential markdown formatting from LLM
-    content = result.content.strip()
-    if content.startswith("```json"):
-        content = content[7:]
-    if content.startswith("```"):
-        content = content[3:]
-    if content.endswith("```"):
-        content = content[:-3]
-        
-    content = content.strip()
+    content = extract_json(result.content)
     
     try:
         parsed_json = json.loads(content)

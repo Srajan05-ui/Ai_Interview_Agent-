@@ -1,4 +1,5 @@
 import json
+import re
 from app.services.llm_router import generate
 
 EVAL_PROMPT = """
@@ -40,6 +41,12 @@ Provide the next question in STRICT JSON matching this schema:
 Return ONLY valid JSON.
 """
 
+def extract_json(content: str) -> str:
+    match = re.search(r'\{.*\}', content, re.DOTALL)
+    if match:
+        return match.group(0)
+    return content
+
 async def evaluate_turn(answer_text: str, question_data: dict) -> dict:
     prompt = EVAL_PROMPT.format(
         question_text=question_data.get("questionText", ""),
@@ -49,13 +56,10 @@ async def evaluate_turn(answer_text: str, question_data: dict) -> dict:
     )
     
     result = await generate(prompt)
-    content = result.content.strip()
-    if content.startswith("```json"): content = content[7:]
-    if content.startswith("```"): content = content[3:]
-    if content.endswith("```"): content = content[:-3]
+    content = extract_json(result.content)
     
     try:
-        return json.loads(content.strip())
+        return json.loads(content)
     except Exception as e:
         print(f"Eval parse error: {e}")
         return {"score": 50, "feedback": "Could not parse evaluation.", "topicMasteryUpdate": "maintain"}
@@ -68,13 +72,10 @@ async def generate_next_question(concept_graph: dict, session_data: dict) -> dic
     )
     
     result = await generate(prompt)
-    content = result.content.strip()
-    if content.startswith("```json"): content = content[7:]
-    if content.startswith("```"): content = content[3:]
-    if content.endswith("```"): content = content[:-3]
+    content = extract_json(result.content)
     
     try:
-        return json.loads(content.strip())
+        return json.loads(content)
     except Exception as e:
         print(f"Question generation parse error: {e}")
         return {

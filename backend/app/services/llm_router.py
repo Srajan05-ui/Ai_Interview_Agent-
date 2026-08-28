@@ -30,8 +30,9 @@ async def generate(prompt: str, response_schema: Optional[Dict[str, Any]] = None
     """
     # 1. Primary: Gemini
     try:
-        if os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"):
-            llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if api_key:
+            llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key)
             response = await _call_provider_with_timeout(lambda: llm.ainvoke([HumanMessage(content=prompt)]))
             return LLMResult(content=response.content, provider="gemini")
     except Exception as e:

@@ -4,7 +4,7 @@
 import { useInterviewRest } from "@/hooks/useInterviewRest";
 import { useAntiCheat } from "@/hooks/useAntiCheat";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { auth } from "@/lib/firebase";
 import { endInterview } from "@/lib/api-client";
 
@@ -25,6 +25,8 @@ export default function InterviewRoomClient() {
   
   // Dev toggle to test Phase 4 layout. In production, this maps to session.interviewType
   const [isCodingMode, setIsCodingMode] = useState(true);
+  
+  const cheatTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const {
     liveTranscript,
@@ -34,7 +36,11 @@ export default function InterviewRoomClient() {
     sendEvent
   } = useInterviewRest(sessionId);
 
-  const { flagCheat } = useAntiCheat(sessionId, () => setLocalCheatWarning(true));
+  const { flagCheat } = useAntiCheat(sessionId, () => {
+    setLocalCheatWarning(true);
+    if (cheatTimeoutRef.current) clearTimeout(cheatTimeoutRef.current);
+    cheatTimeoutRef.current = setTimeout(() => setLocalCheatWarning(false), 5000);
+  });
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();

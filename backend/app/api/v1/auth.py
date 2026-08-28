@@ -8,25 +8,30 @@ from app.schemas import UserResponse
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth
 import os
+import json
 from datetime import datetime
 
 router = APIRouter()
 security = HTTPBearer()
 
-# Initialize Firebase Admin (in a real app, do this in main.py lifespan)
-# For Phase 0, we'll try to initialize here or mock it if credentials are missing
+# Initialize Firebase Admin SDK from environment variable (JSON string)
 if not firebase_admin._apps:
     try:
-        cred_path = os.getenv("FIREBASE_ADMIN_CREDENTIALS_JSON", "path/to/fake.json")
-        if os.path.exists(cred_path):
-            cred = credentials.Certificate(cred_path)
+        cred_json = os.getenv("FIREBASE_ADMIN_CREDENTIALS_JSON")
+        if cred_json:
+            cred_dict = json.loads(cred_json)
+            cred = credentials.Certificate(cred_dict)
             firebase_admin.initialize_app(cred)
+            print("Firebase Admin initialized successfully.")
+        else:
+            print("Warning: FIREBASE_ADMIN_CREDENTIALS_JSON not set. Auth will only accept mock tokens.")
     except Exception as e:
-        print(f"Warning: Firebase Admin not initialized: {e}")
+        print(f"Warning: Firebase Admin init failed: {e}")
 
 async def verify_firebase_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     try:
+        # Allow mock token for local dev/testing
         if token == "mock-token":
             return {"uid": "mock-uid-123", "email": "test@example.com", "name": "Test User", "firebase": {"sign_in_provider": "google"}}
         decoded_token = firebase_auth.verify_id_token(token)
@@ -47,13 +52,11 @@ async def get_current_user(
     email = decoded_token.get("email")
     name = decoded_token.get("name", "Unknown User")
     provider = decoded_token.get("firebase", {}).get("sign_in_provider", "google")
-    
-    # Query database for user
+
     result = await db.execute(select(User).where(User.id == uid))
     user = result.scalars().first()
-    
+
     if not user:
-        # Create user if they don't exist
         user = User(
             id=uid,
             email=email,
@@ -65,9 +68,8 @@ async def get_current_user(
         await db.commit()
         await db.refresh(user)
 
-    # Determine profile completeness
     profile_complete = bool(user.target_role and user.experience_level)
-    
+
     return UserResponse(
         id=user.id,
         email=user.email,

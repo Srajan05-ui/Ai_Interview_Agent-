@@ -6,6 +6,7 @@ python-dotenv
 firebase-admin
 sqlalchemy[asyncio]
 asyncpg
+aiosqlite
 alembic
 langchain
 langchain-google-genai
@@ -16,10 +17,7 @@ PyMuPDF
 python-docx
 qdrant-client
 redis
-qdrant-client
-redis
 websockets
 elevenlabs
 openai
-aiosqlite
 httpx

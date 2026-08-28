@@ -79,8 +79,8 @@ async def generate_next_question(concept_graph: dict, session_data: dict) -> dic
     except Exception as e:
         print(f"Question generation parse error: {e}")
         return {
-            "questionText": "Could you tell me about a time you solved a difficult technical problem?",
-            "topic": "behavioral",
+            "questionText": f"DEBUG: {str(e)} | RAW LLM: {content}",
+            "topic": "error",
             "difficulty": "medium",
             "adaptiveReason": "Fallback question due to parsing error."
         }

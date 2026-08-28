@@ -41,7 +41,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <header className="relative z-10 max-w-5xl mx-auto text-center pt-32 pb-20 px-6">
         <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700 leading-tight">
-          Ace your <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-transparent bg-clip-text drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]">AI & ML</span><br /> engineering interviews.
+          Ace your <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-transparent bg-clip-text drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]">Software</span><br /> engineering interviews.
         </h1>
         
         <p className="text-xl md:text-2xl text-zinc-400 mb-12 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 leading-relaxed">

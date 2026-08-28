@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { startInterview } from "@/lib/api-client";
 import { auth } from "@/lib/firebase";
 
-export default function InterviewSetupPage() {
+function SetupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("resumeId");
@@ -143,5 +143,13 @@ export default function InterviewSetupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InterviewSetupPage() {
+  return (
+    <Suspense fallback={<div className="max-w-4xl mx-auto p-8 mt-10 text-white">Loading setup...</div>}>
+      <SetupContent />
+    </Suspense>
   );
 }
